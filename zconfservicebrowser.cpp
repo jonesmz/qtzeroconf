@@ -98,8 +98,8 @@ QString ZConfServiceEntry::protocolName() const
 class ZConfServiceBrowserPrivate
 {
 public:
-    ZConfServiceBrowserPrivate(ZConfServiceClient *client)
-        : client(client), browser(0)
+    ZConfServiceBrowserPrivate(ZConfServiceClient *in_client)
+        : client(in_client), browser(0)
     {
     }
 
@@ -117,8 +117,10 @@ public:
         Q_UNUSED(flags);
 
         ZConfServiceBrowser *serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
-        if (serviceBrowser) {
-            switch (event) {
+        if (serviceBrowser)
+        {
+            switch (event)
+            {
             case AVAHI_BROWSER_FAILURE:
                 qDebug() << ("Avahi browser error: " % QString(avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client))));
                 break;
@@ -174,8 +176,10 @@ public:
         Q_UNUSED(txt);
 
         ZConfServiceBrowser *serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
-        if (serviceBrowser) {
-            switch (event) {
+        if (serviceBrowser)
+        {
+            switch (event)
+            {
                 case AVAHI_RESOLVER_FAILURE:
                     qDebug() << ("Failed to resolve service '" % QString(name) % "': " % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
                     break;
@@ -238,7 +242,9 @@ ZConfServiceBrowser::ZConfServiceBrowser(QObject *parent)
 ZConfServiceBrowser::~ZConfServiceBrowser()
 {
     if (d_ptr->browser)
+    {
         avahi_service_browser_free(d_ptr->browser);
+    }
     delete d_ptr;
 }
 
@@ -267,7 +273,9 @@ ZConfServiceEntry ZConfServiceBrowser::serviceEntry(QString name)
 void ZConfServiceBrowser::createServiceBrowser()
 {
     if (d_ptr->browser)
+    {
         return;
+    }
     d_ptr->browser = avahi_service_browser_new(d_ptr->client->client,
                                                AVAHI_IF_UNSPEC,
                                                AVAHI_PROTO_UNSPEC,

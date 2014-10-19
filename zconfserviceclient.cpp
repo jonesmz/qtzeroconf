@@ -25,7 +25,9 @@
 void ZConfServiceClient::run()
 {
     if (client)
+    {
         return;
+    }
     avahi_client_new(poll, (AvahiClientFlags) 0, ZConfServiceClient::callback, this, &error);
 }
 
@@ -53,7 +55,8 @@ ZConfServiceClient::~ZConfServiceClient()
 void ZConfServiceClient::callback(AvahiClient *client, AvahiClientState state, void *userdata)
 {
     ZConfServiceClient *service = static_cast<ZConfServiceClient *>(userdata);
-    if (service) {
+    if (service)
+    {
         service->client = client;
         switch (state)
         {

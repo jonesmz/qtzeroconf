@@ -37,7 +37,8 @@ public:
     {
         Q_UNUSED(group);
         ZConfService *serviceGroup = static_cast<ZConfService *>(userdata);
-        if (serviceGroup) {
+        if (serviceGroup)
+        {
             switch (state)
             {
             case AVAHI_ENTRY_GROUP_ESTABLISHED:
@@ -92,7 +93,9 @@ ZConfService::ZConfService(QObject *parent)
 ZConfService::~ZConfService()
 {
     if (d_ptr->group)
+    {
         avahi_entry_group_free(d_ptr->group);
+    }
     delete d_ptr;
 }
 
@@ -111,7 +114,9 @@ bool ZConfService::isValid() const
 QString ZConfService::errorString() const
 {
     if (!d_ptr->client->client)
+    {
         return "No client!";
+    }
     return avahi_strerror(avahi_client_errno(d_ptr->client->client));
 }
 
@@ -123,7 +128,8 @@ QString ZConfService::errorString() const
 void ZConfService::registerService(QString name, in_port_t port, QString type)
 {
     if (!d_ptr->client->client || AVAHI_CLIENT_S_RUNNING
-            != avahi_client_get_state(d_ptr->client->client)) {
+            != avahi_client_get_state(d_ptr->client->client))
+    {
         qDebug() << "ZConfService error: Client is not running.";
         return;
     }
@@ -132,12 +138,14 @@ void ZConfService::registerService(QString name, in_port_t port, QString type)
     d_ptr->port = port;
     d_ptr->type = type;
 
-    if (!d_ptr->group) {
+    if (!d_ptr->group)
+    {
         d_ptr->group = avahi_entry_group_new(d_ptr->client->client,
                                              ZConfServicePrivate::callback,
                                              this);
     }
-    if (avahi_entry_group_is_empty(d_ptr->group)) {
+    if (avahi_entry_group_is_empty(d_ptr->group))
+    {
         d_ptr->error = avahi_entry_group_add_service(d_ptr->group,
                                                      AVAHI_IF_UNSPEC,
                                                      AVAHI_PROTO_UNSPEC,
@@ -148,11 +156,14 @@ void ZConfService::registerService(QString name, in_port_t port, QString type)
                                                      0,
                                                      d_ptr->port,
                                                      NULL);
-        if (!d_ptr->error) {
+        if (!d_ptr->error)
+        {
             d_ptr->error = avahi_entry_group_commit(d_ptr->group);
         }
         if (d_ptr->error)
+        {
             qDebug() << ("Error creating service: " % errorString());
+        }
     }
 }
 
