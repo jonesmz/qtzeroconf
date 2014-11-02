@@ -6,6 +6,6 @@ includedir=${prefix}/include
 Name: qtzeromq
 Description: Qt Bindings for the Avahi mDNS implementation
 Version: 9999
-Requires.private: avahi-qt5
+Requires.private: avahi-qt5 avahi-client
 Libs: -L${libdir} -lqtzeroconf
 Cflags: -I${includedir}
