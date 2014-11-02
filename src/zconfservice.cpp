@@ -22,8 +22,8 @@
 #include <avahi-client/publish.h>
 #include <avahi-common/error.h>
 #include <avahi-common/alternative.h>
-#include "zconfserviceclient.h"
-#include "zconfservice.h"
+#include "qtzeroconf/zconfserviceclient.h"
+#include "qtzeroconf/zconfservice.h"
 
 class ZConfServicePrivate
 {

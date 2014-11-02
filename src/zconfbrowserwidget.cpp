@@ -18,8 +18,8 @@
  */
 
 #include <QDebug>
-#include "zconfbrowserwidget.h"
-#include "zconfservicebrowser.h"
+#include "qtzeroconf/zconfbrowserwidget.h"
+#include "qtzeroconf/zconfservicebrowser.h"
 
 class ZConfBrowserWidgetPrivate
 {

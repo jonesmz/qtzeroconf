@@ -20,7 +20,7 @@
 #include <QDebug>
 #include <avahi-qt4/qt-watch.h>
 #include <avahi-common/error.h>
-#include "zconfserviceclient.h"
+#include "qtzeroconf/zconfserviceclient.h"
 
 void ZConfServiceClient::run()
 {

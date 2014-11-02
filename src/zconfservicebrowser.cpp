@@ -22,8 +22,8 @@
 #include <QDebug>
 #include <cassert>
 #include <avahi-common/error.h>
-#include "zconfservicebrowser.h"
-#include "zconfserviceclient.h"
+#include "qtzeroconf/zconfservicebrowser.h"
+#include "qtzeroconf/zconfserviceclient.h"
 
 /*!
     \struct ZConfServiceEntry

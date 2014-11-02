@@ -11,4 +11,6 @@ CONFIG(debug, debug|release) {
      TARGET = $$join(TARGET,,,d)
 }
 
+INCLUDEPATH += include/
+
 include(zconf.pri)
