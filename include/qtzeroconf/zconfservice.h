@@ -21,6 +21,8 @@
 #define ZCONFSERVICE_H
 
 #include <QObject>
+#include <QStringList>
+
 #include <arpa/inet.h>
 
 class ZConfServicePrivate;
@@ -41,7 +43,7 @@ signals:
     void entryGroupFailure();
 
 public slots:
-    void registerService(QString name, in_port_t port, QString type = "_http._tcp");
+    void registerService(QString name, in_port_t port, QString type = "_http._tcp", QStringList txtRecords = QStringList());
     void resetService();
 
 protected:

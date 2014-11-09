@@ -122,12 +122,22 @@ QString ZConfService::errorString() const
     return avahi_strerror(avahi_client_errno(d_ptr->client->client));
 }
 
+static AvahiStringList * convertQStringListToAvahiStringList(const QStringList & list)
+{
+    AvahiStringList * avahiTXTRecords = nullptr;
+    for(const QString & string : list)
+    {
+        avahiTXTRecords = avahi_string_list_add(avahiTXTRecords, string.toLocal8Bit().data());
+    }
+    return avahiTXTRecords;
+}
+
 /*!
     Registers a Zeroconf service on the LAN. If no service type is specified,
     "_http._tcp" is assumed. Needless to say, the server should be available
     and listen on the specified port.
  */
-void ZConfService::registerService(QString name, in_port_t port, QString type)
+void ZConfService::registerService(QString name, in_port_t port, QString type, QStringList txtRecords)
 {
     if (   !d_ptr->client->client
         || AVAHI_CLIENT_S_RUNNING != avahi_client_get_state(d_ptr->client->client))
@@ -149,16 +159,21 @@ void ZConfService::registerService(QString name, in_port_t port, QString type)
 
     if (avahi_entry_group_is_empty(d_ptr->group))
     {
-        d_ptr->error = avahi_entry_group_add_service(d_ptr->group,
-                                                     AVAHI_IF_UNSPEC,
-                                                     AVAHI_PROTO_UNSPEC,
-                                                     (AvahiPublishFlags) 0,
-                                                     d_ptr->name.toLatin1().data(),
-                                                     d_ptr->type.toLatin1().data(),
-                                                     0,
-                                                     0,
-                                                     d_ptr->port,
-                                                     NULL);
+        AvahiStringList * avahiTXTRecords = convertQStringListToAvahiStringList(txtRecords);
+
+        d_ptr->error = avahi_entry_group_add_service_strlst(d_ptr->group,
+                                                            AVAHI_IF_UNSPEC,
+                                                            AVAHI_PROTO_UNSPEC,
+                                                            (AvahiPublishFlags) 0,
+                                                            d_ptr->name.toLatin1().data(),
+                                                            d_ptr->type.toLatin1().data(),
+                                                            nullptr,
+                                                            nullptr,
+                                                            d_ptr->port,
+                                                            avahiTXTRecords);
+
+        avahi_string_list_free(avahiTXTRecords);
+
         if (!d_ptr->error)
         {
             d_ptr->error = avahi_entry_group_commit(d_ptr->group);

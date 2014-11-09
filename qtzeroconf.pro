@@ -3,6 +3,7 @@ TARGET     = qtzeroconf
 VERSION    = 9999
 DESTDIR    = $$_PRO_FILE_PWD_/bin
 TEMPLATE   = lib
+CONFIG    += c++11
 CONFIG    += link_pkgconfig
 PKGCONFIG += avahi-qt5 avahi-client
 
