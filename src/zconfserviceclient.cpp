@@ -18,7 +18,7 @@
  */
 
 #include <QDebug>
-#include <avahi-qt4/qt-watch.h>
+#include <avahi-qt5/qt-watch.h>
 #include <avahi-common/error.h>
 #include "qtzeroconf/zconfserviceclient.h"
 
