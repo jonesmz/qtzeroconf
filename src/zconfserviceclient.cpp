@@ -47,9 +47,11 @@ ZConfServiceClient::ZConfServiceClient(QObject *parent)
 ZConfServiceClient::~ZConfServiceClient()
 {
     if (client)
+    {
         // This will automatically free all associated browser,
         // resolve and entry group objects.
         avahi_client_free(client);
+    }
 }
 
 void ZConfServiceClient::callback(AvahiClient *client, AvahiClientState state, void *userdata)

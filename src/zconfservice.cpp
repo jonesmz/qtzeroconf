@@ -29,7 +29,9 @@ class ZConfServicePrivate
 {
 public:
     ZConfServicePrivate()
-        : client(0), group(0), error(0)
+        : client(0)
+        , group(0)
+        , error(0)
     {
     }
 
@@ -127,8 +129,8 @@ QString ZConfService::errorString() const
  */
 void ZConfService::registerService(QString name, in_port_t port, QString type)
 {
-    if (!d_ptr->client->client || AVAHI_CLIENT_S_RUNNING
-            != avahi_client_get_state(d_ptr->client->client))
+    if (   !d_ptr->client->client
+        || AVAHI_CLIENT_S_RUNNING != avahi_client_get_state(d_ptr->client->client))
     {
         qDebug() << "ZConfService error: Client is not running.";
         return;
@@ -144,6 +146,7 @@ void ZConfService::registerService(QString name, in_port_t port, QString type)
                                              ZConfServicePrivate::callback,
                                              this);
     }
+
     if (avahi_entry_group_is_empty(d_ptr->group))
     {
         d_ptr->error = avahi_entry_group_add_service(d_ptr->group,
@@ -160,6 +163,7 @@ void ZConfService::registerService(QString name, in_port_t port, QString type)
         {
             d_ptr->error = avahi_entry_group_commit(d_ptr->group);
         }
+
         if (d_ptr->error)
         {
             qDebug() << ("Error creating service: " % errorString());
