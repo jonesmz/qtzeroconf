@@ -1,5 +1,6 @@
 include(../../project_settings.pri)
-TARGET     = qtzeroconf-service
+DEPENDENCY_LIBRARIES = qtzeroconf-common
+include(../../dependency.pri)
 TEMPLATE   = lib
 CONFIG    += link_pkgconfig
 PKGCONFIG += avahi-qt5 avahi-client

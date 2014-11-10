@@ -1,4 +1,6 @@
 include(../../project_settings.pri)
+DEPENDENCY_LIBRARIES = qtzeroconf-common
+include(../../dependency.pri)
 TARGET     = qtzeroconf-browser
 TEMPLATE   = lib
 CONFIG    += link_pkgconfig
