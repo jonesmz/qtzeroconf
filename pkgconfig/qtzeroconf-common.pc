@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=/usr/lib64
+includedir=${prefix}/include
+
+Name: qtzeroconf-common
+Description: Qt Bindings for the Avahi mDNS implementation
+Version: 9999
+Requires.private: avahi-qt5 avahi-client
+Libs: -L${libdir} -lqtzeroconf-common
+Cflags: -I${includedir}
