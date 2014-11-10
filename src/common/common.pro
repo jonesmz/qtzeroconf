@@ -6,3 +6,4 @@ PKGCONFIG += avahi-qt5 avahi-client
 
 INCLUDEPATH += $$PROJ_DIR/include/
 SOURCES     += zconfserviceclient.cpp
+HEADERS     += $$PROJ_DIR/include/qtzeroconf/zconfserviceclient.h

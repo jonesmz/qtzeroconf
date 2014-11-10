@@ -8,3 +8,4 @@ PKGCONFIG += avahi-qt5 avahi-client
 
 INCLUDEPATH += $$PROJ_DIR/include/
 SOURCES     += zconfservicebrowser.cpp
+HEADERS     += $$PROJ_DIR/include/qtzeroconf/zconfservicebrowser.h
