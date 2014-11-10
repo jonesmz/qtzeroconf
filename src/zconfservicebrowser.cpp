@@ -71,15 +71,17 @@ QString ZConfServiceEntry::protocolName() const
     }
 }
 
-static QStringList avahiStrlstToQStringList(const AvahiStringList * txt)
+static QMap<QString, QString> avahiStrlstToQMap(const AvahiStringList * txt)
 {
-    QStringList returnlist;
+    QMap<QString, QString> returnMap;
     while(nullptr != txt)
     {
-        returnlist << QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])), txt->size);
+        const QStringList & split = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
+                                                                                 txt->size).split('=');
+        returnMap.insert(split.first(), split.last());
         txt = txt->next;
     }
-    return returnlist;
+    return returnMap;
 }
 
 /*!
@@ -205,7 +207,7 @@ public:
                     entry.port       = port;
                     entry.protocol   = protocol;
                     entry.flags      = flags;
-                    entry.TXTRecords = avahiStrlstToQStringList(txt);
+                    entry.TXTRecords = avahiStrlstToQMap(txt);
                     serviceBrowser->d_ptr->entries.insert(name, entry);
                     emit serviceBrowser->serviceEntryAdded(name);
                 }

@@ -23,8 +23,8 @@
 #include <stdint.h>
 #include <avahi-client/lookup.h>
 
+#include <QMap>
 #include <QObject>
-#include <QStringList>
 
 struct ZConfServiceEntry
 {
@@ -36,7 +36,7 @@ struct ZConfServiceEntry
     uint16_t               port;
     AvahiProtocol          protocol;
     AvahiLookupResultFlags flags;
-    QStringList            TXTRecords;
+    QMap<QString, QString> TXTRecords;
 
     QString protocolName() const;
     inline bool isValid() const { return !(ip.isEmpty() && host.isEmpty()); }

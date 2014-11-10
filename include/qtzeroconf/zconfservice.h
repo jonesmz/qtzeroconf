@@ -20,10 +20,10 @@
 #ifndef ZCONFSERVICE_H
 #define ZCONFSERVICE_H
 
-#include <QObject>
-#include <QStringList>
-
 #include <arpa/inet.h>
+
+#include <QMap>
+#include <QObject>
 
 class ZConfServicePrivate;
 class ZConfService : public QObject
@@ -46,7 +46,7 @@ public slots:
     void registerService(QString name,
                          in_port_t port,
                          QString type = QLatin1String("_http._tcp"),
-                         QStringList txtRecords = QStringList());
+                         QMap<QString, QString> txtRecords = QMap<QString, QString>());
     void resetService();
 
 protected:
