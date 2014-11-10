@@ -43,7 +43,10 @@ signals:
     void entryGroupFailure();
 
 public slots:
-    void registerService(QString name, in_port_t port, QString type = "_http._tcp", QStringList txtRecords = QStringList());
+    void registerService(QString name,
+                         in_port_t port,
+                         QString type = QLatin1String("_http._tcp"),
+                         QStringList txtRecords = QStringList());
     void resetService();
 
 protected:

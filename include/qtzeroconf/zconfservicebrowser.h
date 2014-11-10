@@ -20,18 +20,23 @@
 #ifndef ZCONFSERVICEBROWSER_H
 #define ZCONFSERVICEBROWSER_H
 
-#include <QObject>
 #include <stdint.h>
 #include <avahi-client/lookup.h>
 
+#include <QObject>
+#include <QStringList>
+
 struct ZConfServiceEntry
 {
+    AvahiIfIndex           interface;
     QString                ip;
     QString                domain;
+    QString                type;
     QString                host;
     uint16_t               port;
     AvahiProtocol          protocol;
     AvahiLookupResultFlags flags;
+    QStringList            TXTRecords;
 
     QString protocolName() const;
     inline bool isValid() const { return !(ip.isEmpty() && host.isEmpty()); }
@@ -57,9 +62,6 @@ public:
 signals:
     void serviceEntryAdded(QString);
     void serviceEntryRemoved(QString);
-
-protected slots:
-    void createServiceBrowser();
 
 protected:
     ZConfServiceBrowserPrivate *const d_ptr;

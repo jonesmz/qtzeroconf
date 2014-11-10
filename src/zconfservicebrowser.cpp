@@ -71,6 +71,17 @@ QString ZConfServiceEntry::protocolName() const
     }
 }
 
+static QStringList avahiStrlstToQStringList(const AvahiStringList * txt)
+{
+    QStringList returnlist;
+    while(nullptr != txt)
+    {
+        returnlist << QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])), txt->size);
+        txt = txt->next;
+    }
+    return returnlist;
+}
+
 /*!
     \fn bool ZConfServiceEntry::isCached() const
 
@@ -171,8 +182,6 @@ public:
                         AvahiLookupResultFlags  flags,
                         void                   *userdata)
 {
-        Q_UNUSED(interface);
-        Q_UNUSED(type);
         Q_UNUSED(txt);
 
         ZConfServiceBrowser *serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
@@ -188,12 +197,15 @@ public:
                     char a[AVAHI_ADDRESS_STR_MAX];
                     avahi_address_snprint(a, sizeof(a), address);
                     ZConfServiceEntry entry;
-                    entry.ip        = QString(a);
-                    entry.domain    = domain;
-                    entry.host      = host_name;
-                    entry.port      = port;
-                    entry.protocol  = protocol;
-                    entry.flags     = flags;
+                    entry.interface  = interface;
+                    entry.ip         = QString(a);
+                    entry.type       = QString(type);
+                    entry.domain     = domain;
+                    entry.host       = host_name;
+                    entry.port       = port;
+                    entry.protocol   = protocol;
+                    entry.flags      = flags;
+                    entry.TXTRecords = avahiStrlstToQStringList(txt);
                     serviceBrowser->d_ptr->entries.insert(name, entry);
                     emit serviceBrowser->serviceEntryAdded(name);
                 }
@@ -233,7 +245,21 @@ ZConfServiceBrowser::ZConfServiceBrowser(QObject *parent)
     : QObject(parent),
       d_ptr(new ZConfServiceBrowserPrivate(new ZConfServiceClient(this)))
 {
-    connect(d_ptr->client, SIGNAL(clientRunning()), this, SLOT(createServiceBrowser()));
+    connect(d_ptr->client, &ZConfServiceClient::clientRunning, [this]()
+    {
+        if (this->d_ptr->browser)
+        {
+            return;
+        }
+        this->d_ptr->browser = avahi_service_browser_new(d_ptr->client->client,
+                                                   AVAHI_IF_UNSPEC,
+                                                   AVAHI_PROTO_UNSPEC,
+                                                   d_ptr->type.toLatin1().data(),
+                                                   NULL,
+                                                   (AvahiLookupFlags) 0,
+                                                   ZConfServiceBrowserPrivate::callback,
+                                                   this);
+    });
 }
 
 /*!
@@ -268,20 +294,4 @@ void ZConfServiceBrowser::browse(QString serviceType)
 ZConfServiceEntry ZConfServiceBrowser::serviceEntry(QString name)
 {
     return d_ptr->entries.value(name);
-}
-
-void ZConfServiceBrowser::createServiceBrowser()
-{
-    if (d_ptr->browser)
-    {
-        return;
-    }
-    d_ptr->browser = avahi_service_browser_new(d_ptr->client->client,
-                                               AVAHI_IF_UNSPEC,
-                                               AVAHI_PROTO_UNSPEC,
-                                               d_ptr->type.toLatin1().data(),
-                                               NULL,
-                                               (AvahiLookupFlags) 0,
-                                               ZConfServiceBrowserPrivate::callback,
-                                               this);
 }
