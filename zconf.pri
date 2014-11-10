@@ -1,6 +1,6 @@
-SOURCES += $$PWD/src/zconfservice.cpp \
-           $$PWD/src/zconfserviceclient.cpp \
-           $$PWD/src/zconfservicebrowser.cpp
+SOURCES += $$PWD/src/service/zconfservice.cpp \
+           $$PWD/src/common/zconfserviceclient.cpp \
+           $$PWD/src/browser/zconfservicebrowser.cpp
 
 HEADERS += $$PWD/include/qtzeroconf/zconfservice.h \
            $$PWD/include/qtzeroconf/zconfserviceclient.h \
