@@ -26,6 +26,8 @@
 #include <QMap>
 #include <QObject>
 
+typedef QMap<QString, QString> QStringMap;
+
 struct ZConfServiceEntry
 {
     AvahiIfIndex           interface;
@@ -36,7 +38,7 @@ struct ZConfServiceEntry
     uint16_t               port;
     AvahiProtocol          protocol;
     AvahiLookupResultFlags flags;
-    QMap<QString, QString> TXTRecords;
+    QStringMap             TXTRecords;
 
     QString protocolName() const;
     inline bool isValid() const { return !(ip.isEmpty() && host.isEmpty()); }

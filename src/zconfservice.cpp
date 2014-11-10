@@ -122,7 +122,7 @@ QString ZConfService::errorString() const
     return avahi_strerror(avahi_client_errno(d_ptr->client->client));
 }
 
-static AvahiStringList * convertQMapToAvahiStringList(const QMap<QString, QString> & map)
+static AvahiStringList * convertQMapToAvahiStringList(const QStringMap & map)
 {
     AvahiStringList * avahiTXTRecords = nullptr;
     for(const QString & key : map.keys())
@@ -138,7 +138,7 @@ static AvahiStringList * convertQMapToAvahiStringList(const QMap<QString, QStrin
     "_http._tcp" is assumed. Needless to say, the server should be available
     and listen on the specified port.
  */
-void ZConfService::registerService(QString name, in_port_t port, QString type, QMap<QString, QString> txtRecords)
+void ZConfService::registerService(QString name, in_port_t port, QString type, QStringMap txtRecords)
 {
     if (   !d_ptr->client->client
         || AVAHI_CLIENT_S_RUNNING != avahi_client_get_state(d_ptr->client->client))

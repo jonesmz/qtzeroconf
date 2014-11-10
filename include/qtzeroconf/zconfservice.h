@@ -25,6 +25,8 @@
 #include <QMap>
 #include <QObject>
 
+typedef QMap<QString, QString> QStringMap;
+
 class ZConfServicePrivate;
 class ZConfService : public QObject
 {
@@ -46,7 +48,7 @@ public slots:
     void registerService(QString name,
                          in_port_t port,
                          QString type = QLatin1String("_http._tcp"),
-                         QMap<QString, QString> txtRecords = QMap<QString, QString>());
+                         QStringMap txtRecords = QStringMap());
     void resetService();
 
 protected:

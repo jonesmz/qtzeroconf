@@ -71,13 +71,13 @@ QString ZConfServiceEntry::protocolName() const
     }
 }
 
-static QMap<QString, QString> avahiStrlstToQMap(const AvahiStringList * txt)
+static QStringMap avahiStrlstToQMap(const AvahiStringList * txt)
 {
-    QMap<QString, QString> returnMap;
+    QStringMap returnMap;
     while(nullptr != txt)
     {
         const QStringList & split = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
-                                                                                 txt->size).split('=');
+                                                                                         txt->size).split('=');
         returnMap.insert(split.first(), split.last());
         txt = txt->next;
     }
