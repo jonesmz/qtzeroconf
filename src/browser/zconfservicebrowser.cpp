@@ -201,8 +201,9 @@ public:
                                                                         QStringMap returnMap;
                                                                         while(nullptr != txt)
                                                                         {
+                                                                            static const QLatin1Char equals('=');
                                                                             const QStringList & split = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
-                                                                                                                               txt->size).split('=');
+                                                                                                                               txt->size).split(equals);
                                                                             returnMap.insert(split.first(), split.last());
                                                                             txt = txt->next;
                                                                         }
