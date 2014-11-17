@@ -165,15 +165,15 @@ void ZConfService::registerService(const QString &name,
         }
 
         d_ptr->error = avahi_entry_group_add_service_strlst(d_ptr->group,
-                                                    AVAHI_IF_UNSPEC,
-                                                    AVAHI_PROTO_UNSPEC,
-                                                    (AvahiPublishFlags) 0,
-                                                    d_ptr->name.toLatin1().data(),
-                                                    d_ptr->type.toLatin1().data(),
-                                                    nullptr,
-                                                    nullptr,
-                                                    d_ptr->port,
-                                                    avahiTXTRecords);
+                                                            AVAHI_IF_UNSPEC,
+                                                            AVAHI_PROTO_UNSPEC,
+                                                            (AvahiPublishFlags) 0,
+                                                            d_ptr->name.toLocal8Bit().data(),
+                                                            d_ptr->type.toLocal8Bit().data(),
+                                                            nullptr,
+                                                            nullptr,
+                                                            d_ptr->port,
+                                                            avahiTXTRecords);
 
         avahi_string_list_free(avahiTXTRecords);
 
