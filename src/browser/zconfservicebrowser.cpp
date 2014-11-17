@@ -70,9 +70,9 @@ QString ZConfServiceEntry::protocolName() const
 {
     switch (protocol)
     {
-    case AVAHI_PROTO_INET:  return "IPv4";
-    case AVAHI_PROTO_INET6: return "IPv6";
-    default:                return "Unspecified";
+    case AVAHI_PROTO_INET:  return QLatin1String("IPv4");
+    case AVAHI_PROTO_INET6: return QLatin1String("IPv6");
+    default:                return QLatin1String("Unspecified");
     }
 }
 
@@ -140,10 +140,10 @@ public:
             switch (event)
             {
             case AVAHI_BROWSER_FAILURE:
-                qDebug() << ("Avahi browser error: " % QString(avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client))));
+                qDebug() << (QLatin1String("Avahi browser error: ") % QString(avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client))));
                 break;
             case AVAHI_BROWSER_NEW:
-                qDebug() << ("New service '" % QString(name) % "' of type " % QString(type) % " in domain " % QString(domain) % ".");
+                qDebug() << (QLatin1String("New service '") % QString(name) % QLatin1String("' of type ") % QString(type) % QLatin1String(" in domain ") % QString(domain) % QLatin1String("."));
 
                 // We ignore the returned resolver object. In the callback
                 // function we free it. If the server is terminated before
@@ -159,18 +159,18 @@ public:
                                                  (AvahiLookupFlags) 0,
                                                  ZConfServiceBrowserPrivate::resolve,
                                                  serviceBrowser)))
-                    qDebug() << ("Failed to resolve service '" % QString(name) % "': " % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
+                    qDebug() << (QLatin1String("Failed to resolve service '") % QString(name) % QLatin1String("': ") % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
                 break;
             case AVAHI_BROWSER_REMOVE:
-                serviceBrowser->d_ptr->entries.remove(name);
                 emit serviceBrowser->serviceEntryRemoved(name);
-                qDebug() << "Service '" % QString(name) % "' removed from the network.";
+                serviceBrowser->d_ptr->entries.remove(name);
+                qDebug() << QLatin1String("Service '") % QString(name) % QLatin1String("' removed from the network.");
                 break;
             case AVAHI_BROWSER_ALL_FOR_NOW:
             case AVAHI_BROWSER_CACHE_EXHAUSTED:
                 qDebug() << (AVAHI_BROWSER_ALL_FOR_NOW == event
-                             ? "AVAHI_BROWSER_ALL_FOR_NOW"
-                             : "AVAHI_BROWSER_CACHE_EXHAUSTED");
+                             ? QLatin1String("AVAHI_BROWSER_ALL_FOR_NOW")
+                             : QLatin1String("AVAHI_BROWSER_CACHE_EXHAUSTED"));
             } // end switch
         }
     }
@@ -188,7 +188,7 @@ public:
                         AvahiStringList        *txt,
                         AvahiLookupResultFlags  flags,
                         void                   *userdata)
-{
+    {
         Q_UNUSED(txt);
 
         ZConfServiceBrowser *serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
@@ -197,7 +197,7 @@ public:
             switch (event)
             {
                 case AVAHI_RESOLVER_FAILURE:
-                    qDebug() << ("Failed to resolve service '" % QString(name) % "': " % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
+                    qDebug() << (QLatin1String("Failed to resolve service '") % QString(name) % QLatin1String("': ") % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
                     break;
                 case AVAHI_RESOLVER_FOUND:
                 {

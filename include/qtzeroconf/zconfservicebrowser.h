@@ -58,7 +58,7 @@ public:
     explicit ZConfServiceBrowser(QObject *parent = 0);
     ~ZConfServiceBrowser();
 
-    void browse(QString serviceType = "_http._tcp");
+    void browse(QString serviceType = QLatin1String("_http._tcp"));
     ZConfServiceEntry serviceEntry(QString name);
 
 signals:

@@ -11,5 +11,5 @@ for(dep, DEPENDENCY_LIBRARIES) {
     PRE_TARGETDEPS     += $${DESTDIR}/lib$${dep}.$${SONAME}
     QMAKE_LFLAGS += -Wl,-rpath=\'\$\$ORIGIN\'
     QMAKE_LFLAGS += -Wl,-rpath-link=\'$${DESTDIR}\'
-    QMAKE_RPATH=
+    QMAKE_LFLAGS_RPATH =
 }

@@ -65,24 +65,24 @@ void ZConfServiceClient::callback(AvahiClient *client, AvahiClientState state, v
         switch (state)
         {
         case AVAHI_CLIENT_S_RUNNING:
-            qDebug() << "AVAHI_CLIENT_S_RUNNING";
+            qDebug() << QLatin1String("AVAHI_CLIENT_S_RUNNING");
             // The server has started up successfully and registered its host
             // name on the network.
             emit service->clientRunning();
             break;
         case AVAHI_CLIENT_FAILURE:
-            qDebug() << "AVAHI_CLIENT_FAILURE";
+            qDebug() << QLatin1String("AVAHI_CLIENT_FAILURE");
             emit service->clientFailure();
             break;
         case AVAHI_CLIENT_S_COLLISION:
         case AVAHI_CLIENT_S_REGISTERING:
             qDebug() << (AVAHI_CLIENT_S_COLLISION == state
-                        ? "AVAHI_CLIENT_S_COLLISION"
-                        : "AVAHI_CLIENT_S_REGISTERING");
+                        ? QLatin1String("AVAHI_CLIENT_S_COLLISION")
+                        : QLatin1String("AVAHI_CLIENT_S_REGISTERING"));
             emit service->clientReset();
             break;
         case AVAHI_CLIENT_CONNECTING:
-            qDebug() << "AVAHI_CLIENT_CONNECTING";
+            qDebug() << QLatin1String("AVAHI_CLIENT_CONNECTING");
             emit service->clientConnecting();
         } // end switch
     }
