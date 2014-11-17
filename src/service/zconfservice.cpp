@@ -121,11 +121,6 @@ QString ZConfService::errorString() const
     return avahi_strerror(avahi_client_errno(d_ptr->client->client));
 }
 
-namespace
-{
-    template<class T> static const T &const_(const T &t) { return t; }
-}
-
 /*!
     Registers a Zeroconf service on the LAN. If no service type is specified,
     "_http._tcp" is assumed. Needless to say, the server should be available
@@ -157,9 +152,10 @@ void ZConfService::registerService(const QString &name,
     if(avahi_entry_group_is_empty(d_ptr->group))
     {
         AvahiStringList * avahiTXTRecords = nullptr;
-        for(const QString & key : const_(txtRecords.uniqueKeys()))
+        for(const QString & key : const_cast<QList<QString>>(txtRecords.uniqueKeys()))
         {
             static const QLatin1Char equals('=');
+            qDebug() << key << txtRecords[key];
             avahiTXTRecords = avahi_string_list_add(avahiTXTRecords,
                                                    (key % equals % txtRecords[key]).toLocal8Bit().data());
         }
