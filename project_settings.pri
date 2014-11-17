@@ -2,7 +2,7 @@ PROJ_DIR     = $$PWD
 
 QT          -= gui
 QT          += core
-CONFIG      += c++11 separate_debug_info
+CONFIG      += c++11
 VERSION      = 0.0.1
 
 DESTDIR      = $$PROJ_DIR/bin
