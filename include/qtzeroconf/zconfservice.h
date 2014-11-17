@@ -33,29 +33,29 @@ class ZConfService : public QObject
     Q_OBJECT
 
 public:
-    explicit ZConfService(QObject *parent = 0);
+    explicit ZConfService(QObject * parent = nullptr);
     ~ZConfService();
 
     bool isValid() const;
     QString errorString() const;
 
 signals:
-    void entryGroupEstablished();
-    void entryGroupNameCollision();
-    void entryGroupFailure();
+    void entryGroupFailure()       const;
+    void entryGroupEstablished()   const;
+    void entryGroupNameCollision() const;
 
 public slots:
-    void registerService(QString name,
+    void registerService(const QString & name,
                          in_port_t port,
-                         QString type = QLatin1String("_http._tcp"),
-                         QStringMap txtRecords = QStringMap());
+                         const QString & type = QLatin1String("_http._tcp"),
+                         const QStringMap & txtRecords = QStringMap());
     void resetService();
 
 protected:
     ZConfServicePrivate *const d_ptr;
 
 private:
-    Q_DECLARE_PRIVATE(ZConfService);
+    Q_DECLARE_PRIVATE(ZConfService)
 };
 
 #endif // ZCONFSERVICE_H

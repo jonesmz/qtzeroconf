@@ -26,7 +26,7 @@
 
 void ZConfServiceClient::run()
 {
-    if(client)
+    if(nullptr != client)
     {
         return;
     }
@@ -35,20 +35,17 @@ void ZConfServiceClient::run()
 
 QString ZConfServiceClient::errorString() const
 {
-    return avahi_strerror(error);
+    return QString(avahi_strerror(error));
 }
 
 ZConfServiceClient::ZConfServiceClient(QObject *parent)
-    : QObject(parent),
-      poll(avahi_qt_poll_get()),
-      client(0),
-      error(0)
-{
-}
+    : QObject(parent)
+    , poll(avahi_qt_poll_get())
+{ }
 
 ZConfServiceClient::~ZConfServiceClient()
 {
-    if (client)
+    if(nullptr != client)
     {
         // This will automatically free all associated browser,
         // resolve and entry group objects.
@@ -56,13 +53,15 @@ ZConfServiceClient::~ZConfServiceClient()
     }
 }
 
-void ZConfServiceClient::callback(AvahiClient *client, AvahiClientState state, void *userdata)
+void ZConfServiceClient::callback(AvahiClient      * const client,
+                                  AvahiClientState   const state,
+                                  void             * const userdata)
 {
-    ZConfServiceClient *service = static_cast<ZConfServiceClient *>(userdata);
-    if (service)
+    if(nullptr != userdata)
     {
-        service->client = client;
-        switch (state)
+        const ZConfServiceClient * const service = static_cast<ZConfServiceClient *>(userdata);
+        const_cast<ZConfServiceClient * const>(service)->client = client;
+        switch(state)
         {
         case AVAHI_CLIENT_S_RUNNING:
             qDebug() << QLatin1String("AVAHI_CLIENT_S_RUNNING");

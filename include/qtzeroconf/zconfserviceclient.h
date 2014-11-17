@@ -28,17 +28,17 @@ class ZConfServiceClient : public QObject
     Q_OBJECT
 
 signals:
-    void clientRunning();
-    void clientFailure();
-    void clientConnecting();
-    void clientReset();
+    void clientReset()      const;
+    void clientRunning()    const;
+    void clientFailure()    const;
+    void clientConnecting() const;
 
 private:
     friend class ZConfService;
     friend class ZConfServiceBrowser;
     friend class ZConfServiceBrowserPrivate;
 
-    ZConfServiceClient(QObject *parent = 0);
+    ZConfServiceClient(QObject *parent = nullptr);
     ~ZConfServiceClient();
 
     void run();
@@ -46,9 +46,9 @@ private:
 
     static void callback(AvahiClient *client, AvahiClientState state, void *userdata);
 
-    const AvahiPoll *const poll;
-    AvahiClient     *client;
-    int              error;
+    const AvahiPoll * const poll;
+    AvahiClient     *       client = nullptr;
+    int                     error  = 0;
 };
 
 #endif // ZCONFSERVICECLIENT_H

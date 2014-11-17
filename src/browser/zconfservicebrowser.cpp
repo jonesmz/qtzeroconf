@@ -29,7 +29,6 @@
 #include "qtzeroconf/zconfserviceclient.h"
 #include "qtzeroconf/zconfservicebrowser.h"
 
-
 /*!
     \struct ZConfServiceEntry
 
@@ -68,25 +67,12 @@
  */
 QString ZConfServiceEntry::protocolName() const
 {
-    switch (protocol)
+    switch(protocol)
     {
     case AVAHI_PROTO_INET:  return QLatin1String("IPv4");
     case AVAHI_PROTO_INET6: return QLatin1String("IPv6");
     default:                return QLatin1String("Unspecified");
     }
-}
-
-static QStringMap avahiStrlstToQMap(const AvahiStringList * txt)
-{
-    QStringMap returnMap;
-    while(nullptr != txt)
-    {
-        const QStringList & split = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
-                                                                                         txt->size).split('=');
-        returnMap.insert(split.first(), split.last());
-        txt = txt->next;
-    }
-    return returnMap;
 }
 
 /*!
@@ -116,34 +102,33 @@ static QStringMap avahiStrlstToQMap(const AvahiStringList * txt)
 class ZConfServiceBrowserPrivate
 {
 public:
-    ZConfServiceBrowserPrivate(ZConfServiceClient *in_client)
-        : client(in_client), browser(0)
-    {
-    }
+    ZConfServiceBrowserPrivate(ZConfServiceClient * const in_client)
+        : client(in_client)
+    { }
 
-    static void callback(AvahiServiceBrowser     *browser,
-                         AvahiIfIndex             interface,
-                         AvahiProtocol            protocol,
-                         AvahiBrowserEvent        event,
-                         const char              *name,
-                         const char              *type,
-                         const char              *domain,
-                         AvahiLookupResultFlags   flags,
-                         void                    *userdata)
+    static void callback(AvahiServiceBrowser    * const browser,
+                         AvahiIfIndex             const interface,
+                         AvahiProtocol            const protocol,
+                         AvahiBrowserEvent        const event,
+                         const char             * const name,
+                         const char             * const type,
+                         const char             * const domain,
+                         AvahiLookupResultFlags   const flags,
+                         void                   * const userdata)
     {
         Q_UNUSED(browser);
         Q_UNUSED(flags);
-
-        ZConfServiceBrowser *serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
-        if (serviceBrowser)
+        if(nullptr != userdata)
         {
-            switch (event)
+            const QString in_name(name);
+            const ZConfServiceBrowser * const serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
+            switch(event)
             {
             case AVAHI_BROWSER_FAILURE:
                 qDebug() << (QLatin1String("Avahi browser error: ") % QString(avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client))));
                 break;
             case AVAHI_BROWSER_NEW:
-                qDebug() << (QLatin1String("New service '") % QString(name) % QLatin1String("' of type ") % QString(type) % QLatin1String(" in domain ") % QString(domain) % QLatin1String("."));
+                qDebug() << (QLatin1String("New service '") % in_name % QLatin1String("' of type ") % QString(type) % QLatin1String(" in domain ") % QString(domain) % QLatin1String("."));
 
                 // We ignore the returned resolver object. In the callback
                 // function we free it. If the server is terminated before
@@ -153,18 +138,18 @@ public:
                                                  interface,
                                                  protocol,
                                                  name,
-                                                 serviceBrowser->d_ptr->type.toLatin1().data(),
+                                                 serviceBrowser->d_ptr->type.toLocal8Bit().data(),
                                                  domain,
                                                  AVAHI_PROTO_UNSPEC,
                                                  (AvahiLookupFlags) 0,
                                                  ZConfServiceBrowserPrivate::resolve,
-                                                 serviceBrowser)))
-                    qDebug() << (QLatin1String("Failed to resolve service '") % QString(name) % QLatin1String("': ") % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
+                                                 const_cast<ZConfServiceBrowser * const>(serviceBrowser))))
+                    qDebug() << (QLatin1String("Failed to resolve service '") % in_name % QLatin1String("': ") % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
                 break;
             case AVAHI_BROWSER_REMOVE:
-                emit serviceBrowser->serviceEntryRemoved(name);
-                serviceBrowser->d_ptr->entries.remove(name);
-                qDebug() << QLatin1String("Service '") % QString(name) % QLatin1String("' removed from the network.");
+                emit serviceBrowser->serviceEntryRemoved(in_name);
+                serviceBrowser->d_ptr->entries.remove(in_name);
+                qDebug() << QLatin1String("Service '") % in_name % QLatin1String("' removed from the network.");
                 break;
             case AVAHI_BROWSER_ALL_FOR_NOW:
             case AVAHI_BROWSER_CACHE_EXHAUSTED:
@@ -175,46 +160,55 @@ public:
         }
     }
 
-    static void resolve(AvahiServiceResolver   *resolver,
-                        AvahiIfIndex            interface,
-                        AvahiProtocol           protocol,
-                        AvahiResolverEvent      event,
-                        const char             *name,
-                        const char             *type,
-                        const char             *domain,
-                        const char             *host_name,
-                        const AvahiAddress     *address,
-                        uint16_t                port,
-                        AvahiStringList        *txt,
-                        AvahiLookupResultFlags  flags,
-                        void                   *userdata)
+    static void resolve(AvahiServiceResolver   * const resolver,
+                        AvahiIfIndex             const interface,
+                        AvahiProtocol            const protocol,
+                        AvahiResolverEvent       const event,
+                        const char             * const name,
+                        const char             * const type,
+                        const char             * const domain,
+                        const char             * const host_name,
+                        const AvahiAddress     * const address,
+                        uint16_t                 const port,
+                        AvahiStringList        *       txt,
+                        AvahiLookupResultFlags   const flags,
+                        void                   * const userdata)
     {
-        Q_UNUSED(txt);
-
-        ZConfServiceBrowser *serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
-        if (serviceBrowser)
+        if(nullptr != userdata)
         {
+            const QString in_name(name);
+            const ZConfServiceBrowser * const serviceBrowser = static_cast<ZConfServiceBrowser *>(userdata);
             switch (event)
             {
                 case AVAHI_RESOLVER_FAILURE:
-                    qDebug() << (QLatin1String("Failed to resolve service '") % QString(name) % QLatin1String("': ") % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
+                    qDebug() << (QLatin1String("Failed to resolve service '") % in_name % QLatin1String("': ") % avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client)));
                     break;
                 case AVAHI_RESOLVER_FOUND:
                 {
-                    char a[AVAHI_ADDRESS_STR_MAX];
-                    avahi_address_snprint(a, sizeof(a), address);
-                    ZConfServiceEntry entry;
-                    entry.interface  = interface;
-                    entry.ip         = QString(a);
-                    entry.type       = QString(type);
-                    entry.domain     = domain;
-                    entry.host       = host_name;
-                    entry.port       = port;
-                    entry.protocol   = protocol;
-                    entry.flags      = flags;
-                    entry.TXTRecords = avahiStrlstToQMap(txt);
-                    serviceBrowser->d_ptr->entries.insert(name, entry);
-                    emit serviceBrowser->serviceEntryAdded(name);
+                    serviceBrowser->d_ptr->entries.insert(in_name, {interface,
+                                                                    QString(({
+                                                                        char a[AVAHI_ADDRESS_STR_MAX];
+                                                                        avahi_address_snprint(a, sizeof(a), address);
+                                                                        a;
+                                                                    })),
+                                                                    QString(domain),
+                                                                    QString(type),
+                                                                    QString(host_name),
+                                                                    port,
+                                                                    protocol,
+                                                                    flags,
+                                                                    ({
+                                                                        QStringMap returnMap;
+                                                                        while(nullptr != txt)
+                                                                        {
+                                                                            const QStringList & split = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
+                                                                                                                               txt->size).split('=');
+                                                                            returnMap.insert(split.first(), split.last());
+                                                                            txt = txt->next;
+                                                                        }
+                                                                        returnMap;
+                                                                    })});
+                    emit serviceBrowser->serviceEntryAdded(in_name);
                 }
             }
             avahi_service_resolver_free(resolver);
@@ -223,10 +217,10 @@ public:
 
     typedef QHash<QString, ZConfServiceEntry> ZConfServiceEntryTable;
 
-    ZConfServiceClient      *const client;
-    AvahiServiceBrowser     *browser;
-    ZConfServiceEntryTable   entries;
-    QString                  type;
+    ZConfServiceClient     * const client;
+    AvahiServiceBrowser    *       browser = nullptr;
+    ZConfServiceEntryTable         entries;
+    QString                        type;
 };
 
 /*!
@@ -254,18 +248,18 @@ ZConfServiceBrowser::ZConfServiceBrowser(QObject *parent)
 {
     connect(d_ptr->client, &ZConfServiceClient::clientRunning, [this]()
     {
-        if (this->d_ptr->browser)
+        if(nullptr != this->d_ptr->browser)
         {
             return;
         }
         this->d_ptr->browser = avahi_service_browser_new(d_ptr->client->client,
-                                                   AVAHI_IF_UNSPEC,
-                                                   AVAHI_PROTO_UNSPEC,
-                                                   d_ptr->type.toLatin1().data(),
-                                                   NULL,
-                                                   (AvahiLookupFlags) 0,
-                                                   ZConfServiceBrowserPrivate::callback,
-                                                   this);
+                                                         AVAHI_IF_UNSPEC,
+                                                         AVAHI_PROTO_UNSPEC,
+                                                         d_ptr->type.toLocal8Bit().data(),
+                                                         NULL,
+                                                         (AvahiLookupFlags) 0,
+                                                         ZConfServiceBrowserPrivate::callback,
+                                                         this);
     });
 }
 
@@ -274,7 +268,7 @@ ZConfServiceBrowser::ZConfServiceBrowser(QObject *parent)
  */
 ZConfServiceBrowser::~ZConfServiceBrowser()
 {
-    if (d_ptr->browser)
+    if(nullptr != d_ptr->browser)
     {
         avahi_service_browser_free(d_ptr->browser);
     }
@@ -287,10 +281,10 @@ ZConfServiceBrowser::~ZConfServiceBrowser()
     discovered and serviceEntryRemoved() when a service is removed from the
     network.
  */
-void ZConfServiceBrowser::browse(QString serviceType)
+void ZConfServiceBrowser::browse(const QString & serviceType)
 {
     d_ptr->type = serviceType;
-    assert(d_ptr->client);
+    assert(nullptr != d_ptr->client);
     d_ptr->client->run();
 }
 
@@ -298,7 +292,7 @@ void ZConfServiceBrowser::browse(QString serviceType)
     Returns a ZConfServiceEntry struct with detailed information about the
     Zeroconf service associated with the name.
  */
-ZConfServiceEntry ZConfServiceBrowser::serviceEntry(QString name)
+const ZConfServiceEntry& ZConfServiceBrowser::serviceEntry(const QString & name) const
 {
-    return d_ptr->entries.value(name);
+    return d_ptr->entries[name];
 }

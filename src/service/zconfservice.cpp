@@ -31,19 +31,14 @@
 class ZConfServicePrivate
 {
 public:
-    ZConfServicePrivate()
-        : client(0)
-        , group(0)
-        , error(0)
-    {
-    }
-
-    static void callback(AvahiEntryGroup *group, AvahiEntryGroupState state, void *userdata)
+    static void callback(AvahiEntryGroup      * const group,
+                         AvahiEntryGroupState   const state,
+                         void                 * const userdata)
     {
         Q_UNUSED(group);
-        ZConfService *serviceGroup = static_cast<ZConfService *>(userdata);
-        if (serviceGroup)
+        if(nullptr != userdata)
         {
+            const ZConfService * const serviceGroup = static_cast<ZConfService *>(userdata);
             switch (state)
             {
             case AVAHI_ENTRY_GROUP_ESTABLISHED:
@@ -66,12 +61,12 @@ public:
         }
     }
 
-    ZConfServiceClient *client;
-    AvahiEntryGroup    *group;
-    QString             name;
-    in_port_t           port;
-    QString             type;
-    int                 error;
+    ZConfServiceClient * client = nullptr;
+    AvahiEntryGroup    * group  = nullptr;
+    QString              name;
+    in_port_t            port;
+    QString              type;
+    int                  error = 0;
 };
 
 /*!
@@ -84,7 +79,7 @@ public:
     registerService() with a service name and port number.
  */
 
-ZConfService::ZConfService(QObject *parent)
+ZConfService::ZConfService(QObject *const parent)
     : QObject(parent),
       d_ptr(new ZConfServicePrivate)
 {
@@ -97,7 +92,7 @@ ZConfService::ZConfService(QObject *parent)
  */
 ZConfService::~ZConfService()
 {
-    if (d_ptr->group)
+    if(nullptr != d_ptr->group)
     {
         avahi_entry_group_free(d_ptr->group);
     }
@@ -109,7 +104,8 @@ ZConfService::~ZConfService()
  */
 bool ZConfService::isValid() const
 {
-    return (d_ptr->group && !d_ptr->error);
+    return (   (nullptr != d_ptr->group)
+            && (0 == d_ptr->error));
 }
 
 /*!
@@ -118,23 +114,16 @@ bool ZConfService::isValid() const
  */
 QString ZConfService::errorString() const
 {
-    if (!d_ptr->client->client)
+    if(nullptr == d_ptr->client->client)
     {
         return QLatin1String("No client!");
     }
     return avahi_strerror(avahi_client_errno(d_ptr->client->client));
 }
 
-static AvahiStringList * convertQMapToAvahiStringList(const QStringMap & map)
+namespace
 {
-    static const QLatin1String equals("=");
-    AvahiStringList * avahiTXTRecords = nullptr;
-    for(const QString & key : map.keys())
-    {
-        avahiTXTRecords = avahi_string_list_add(avahiTXTRecords,
-                                                (key % equals % map.value(key)).toLocal8Bit().data());
-    }
-    return avahiTXTRecords;
+    template<class T> static const T &const_(const T &t) { return t; }
 }
 
 /*!
@@ -142,10 +131,13 @@ static AvahiStringList * convertQMapToAvahiStringList(const QStringMap & map)
     "_http._tcp" is assumed. Needless to say, the server should be available
     and listen on the specified port.
  */
-void ZConfService::registerService(QString name, in_port_t port, QString type, QStringMap txtRecords)
+void ZConfService::registerService(const QString &name,
+                                   in_port_t const port,
+                                   const QString &type,
+                                   const QStringMap &txtRecords)
 {
-    if (   !d_ptr->client->client
-        || AVAHI_CLIENT_S_RUNNING != avahi_client_get_state(d_ptr->client->client))
+    if(   (nullptr == d_ptr->client->client)
+       || (AVAHI_CLIENT_S_RUNNING != avahi_client_get_state(d_ptr->client->client)))
     {
         qDebug() << QLatin1String("ZConfService error: Client is not running.");
         return;
@@ -155,36 +147,42 @@ void ZConfService::registerService(QString name, in_port_t port, QString type, Q
     d_ptr->port = port;
     d_ptr->type = type;
 
-    if (!d_ptr->group)
+    if(nullptr == d_ptr->group)
     {
         d_ptr->group = avahi_entry_group_new(d_ptr->client->client,
                                              ZConfServicePrivate::callback,
                                              this);
     }
 
-    if (avahi_entry_group_is_empty(d_ptr->group))
+    if(avahi_entry_group_is_empty(d_ptr->group))
     {
-        AvahiStringList * avahiTXTRecords = convertQMapToAvahiStringList(txtRecords);
+        AvahiStringList * avahiTXTRecords = nullptr;
+        for(const QString & key : const_(txtRecords.uniqueKeys()))
+        {
+            static const QLatin1Char equals('=');
+            avahiTXTRecords = avahi_string_list_add(avahiTXTRecords,
+                                                   (key % equals % txtRecords[key]).toLocal8Bit().data());
+        }
 
         d_ptr->error = avahi_entry_group_add_service_strlst(d_ptr->group,
-                                                            AVAHI_IF_UNSPEC,
-                                                            AVAHI_PROTO_UNSPEC,
-                                                            (AvahiPublishFlags) 0,
-                                                            d_ptr->name.toLatin1().data(),
-                                                            d_ptr->type.toLatin1().data(),
-                                                            nullptr,
-                                                            nullptr,
-                                                            d_ptr->port,
-                                                            avahiTXTRecords);
+                                                    AVAHI_IF_UNSPEC,
+                                                    AVAHI_PROTO_UNSPEC,
+                                                    (AvahiPublishFlags) 0,
+                                                    d_ptr->name.toLatin1().data(),
+                                                    d_ptr->type.toLatin1().data(),
+                                                    nullptr,
+                                                    nullptr,
+                                                    d_ptr->port,
+                                                    avahiTXTRecords);
 
         avahi_string_list_free(avahiTXTRecords);
 
-        if (!d_ptr->error)
+        if(0 == d_ptr->error)
         {
             d_ptr->error = avahi_entry_group_commit(d_ptr->group);
         }
 
-        if (d_ptr->error)
+        if(0 != d_ptr->error)
         {
             qDebug() << (QLatin1String("Error creating service: ") % errorString());
         }

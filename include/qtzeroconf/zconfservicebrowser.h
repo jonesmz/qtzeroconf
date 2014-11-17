@@ -40,13 +40,13 @@ struct ZConfServiceEntry
     AvahiLookupResultFlags flags;
     QStringMap             TXTRecords;
 
-    QString protocolName() const;
-    inline bool isValid() const { return !(ip.isEmpty() && host.isEmpty()); }
-
+    QString protocolName()    const;
+    inline bool isValid()     const { return !(ip.isEmpty() && host.isEmpty()); }
+    inline bool isLocal()     const { return flags & AVAHI_LOOKUP_RESULT_LOCAL; }
     inline bool isCached()    const { return flags & AVAHI_LOOKUP_RESULT_CACHED; }
     inline bool isWideArea()  const { return flags & AVAHI_LOOKUP_RESULT_WIDE_AREA; }
     inline bool isMulticast() const { return flags & AVAHI_LOOKUP_RESULT_MULTICAST; }
-    inline bool isLocal()     const { return flags & AVAHI_LOOKUP_RESULT_LOCAL; }
+
 };
 
 class ZConfServiceBrowserPrivate;
@@ -58,12 +58,12 @@ public:
     explicit ZConfServiceBrowser(QObject *parent = 0);
     ~ZConfServiceBrowser();
 
-    void browse(QString serviceType = QLatin1String("_http._tcp"));
-    ZConfServiceEntry serviceEntry(QString name);
+    void browse(const QString & serviceType = QLatin1String("_http._tcp"));
+    const ZConfServiceEntry& serviceEntry(const QString & name) const;
 
 signals:
-    void serviceEntryAdded(QString);
-    void serviceEntryRemoved(QString);
+    void serviceEntryAdded(const QString &) const;
+    void serviceEntryRemoved(const QString &) const;
 
 protected:
     ZConfServiceBrowserPrivate *const d_ptr;
