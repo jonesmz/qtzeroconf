@@ -152,7 +152,7 @@ void ZConfService::registerService(const QString &name,
     if(avahi_entry_group_is_empty(d_ptr->group))
     {
         AvahiStringList * avahiTXTRecords = nullptr;
-        for(const QString & key : const_cast<QList<QString>>(txtRecords.uniqueKeys()))
+        for(const QString & key : txtRecords.uniqueKeys())
         {
             static const QLatin1Char equals('=');
             qDebug() << key << txtRecords[key];
