@@ -168,7 +168,6 @@ void ZConfService::registerService(const QString &name,
         for(const QString & key : txtRecords.uniqueKeys())
         {
             static const QLatin1Char equals('=');
-            qDebug() << key << txtRecords[key];
             avahiTXTRecords = avahi_string_list_add(avahiTXTRecords,
                                                    (key % equals % txtRecords[key]).toLocal8Bit().data());
         }
