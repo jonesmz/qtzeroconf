@@ -60,6 +60,18 @@
 
     The IP port number associated with this service.
  */
+namespace
+{
+    static QString protocolStringName(AvahiProtocol protocol)
+    {
+        switch(protocol)
+        {
+        case AVAHI_PROTO_INET:  return QLatin1String("IPv4");
+        case AVAHI_PROTO_INET6: return QLatin1String("IPv6");
+        default:                return QLatin1String("Unspecified");
+        }
+    }
+}
 
 /*!
     A human-readable string representation of the network layer protocol used
@@ -67,12 +79,7 @@
  */
 QString ZConfServiceEntry::protocolName() const
 {
-    switch(protocol)
-    {
-    case AVAHI_PROTO_INET:  return QLatin1String("IPv4");
-    case AVAHI_PROTO_INET6: return QLatin1String("IPv6");
-    default:                return QLatin1String("Unspecified");
-    }
+    return protocolStringName(this->protocol);
 }
 
 /*!
@@ -128,7 +135,7 @@ public:
                 qDebug() << (QLatin1String("Avahi browser error: ") % QString(avahi_strerror(avahi_client_errno(serviceBrowser->d_ptr->client->client))));
                 break;
             case AVAHI_BROWSER_NEW:
-                qDebug() << (QLatin1String("New service '") % in_name % QLatin1String("' of type ") % QString(type) % QLatin1String(" in domain ") % QString(domain) % QLatin1String("."));
+                qDebug() << (QLatin1String("New service '") % in_name % QLatin1String("' of type ") % QString(type) % QLatin1String(" in domain ") % QString(domain) % QLatin1String(" on protocol ") % protocolStringName(protocol) % QLatin1String("."));
 
                 // We ignore the returned resolver object. In the callback
                 // function we free it. If the server is terminated before
@@ -174,6 +181,7 @@ public:
                         AvahiLookupResultFlags   const flags,
                         void                   * const userdata)
     {
+        static char addr[AVAHI_ADDRESS_STR_MAX];
         if(nullptr != userdata)
         {
             const QString in_name(name);
@@ -185,12 +193,10 @@ public:
                     break;
                 case AVAHI_RESOLVER_FOUND:
                 {
+
+                    avahi_address_snprint(addr, sizeof(addr), address);
                     serviceBrowser->d_ptr->entries.insert(in_name, {interface,
-                                                                    QString(({
-                                                                        char a[AVAHI_ADDRESS_STR_MAX];
-                                                                        avahi_address_snprint(a, sizeof(a), address);
-                                                                        a;
-                                                                    })),
+                                                                    QString::fromLocal8Bit(addr),
                                                                     QString(domain),
                                                                     QString(type),
                                                                     QString(host_name),
@@ -222,6 +228,7 @@ public:
     AvahiServiceBrowser    *       browser = nullptr;
     ZConfServiceEntryTable         entries;
     QString                        type;
+    AvahiProtocol                  proto = AVAHI_PROTO_UNSPEC;
 };
 
 /*!
@@ -255,7 +262,7 @@ ZConfServiceBrowser::ZConfServiceBrowser(QObject *parent)
         }
         this->d_ptr->browser = avahi_service_browser_new(d_ptr->client->client,
                                                          AVAHI_IF_UNSPEC,
-                                                         AVAHI_PROTO_UNSPEC,
+                                                         d_ptr->proto,
                                                          d_ptr->type.toLocal8Bit().data(),
                                                          NULL,
                                                          (AvahiLookupFlags) 0,
@@ -276,15 +283,29 @@ ZConfServiceBrowser::~ZConfServiceBrowser()
     delete d_ptr;
 }
 
+namespace
+{
+    static AvahiProtocol convertProtocol(ZConfServiceBrowser::Protocol proto)
+    {
+        switch(proto)
+        {
+            case ZConfServiceBrowser::ZCONF_IPV4: return AVAHI_PROTO_INET;
+            case ZConfServiceBrowser::ZCONF_IPV6: return AVAHI_PROTO_INET6;
+            default:                              return AVAHI_PROTO_UNSPEC;
+        }
+    }
+}
+
 /*!
     Browses for Zeroconf services on the LAN. This is a non-blocking call.
     ZConfServiceBrowser will emit serviceEntryAdded() when a new service is
     discovered and serviceEntryRemoved() when a service is removed from the
     network.
  */
-void ZConfServiceBrowser::browse(const QString & serviceType)
+void ZConfServiceBrowser::browse(const QString & serviceType, Protocol proto)
 {
-    d_ptr->type = serviceType;
+    d_ptr->type  = serviceType;
+    d_ptr->proto = convertProtocol(proto);
     assert(nullptr != d_ptr->client);
     d_ptr->client->run();
 }

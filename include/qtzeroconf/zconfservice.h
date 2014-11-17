@@ -33,6 +33,13 @@ class ZConfService : public QObject
     Q_OBJECT
 
 public:
+    enum Protocol
+    {
+        ZCONF_IPV4,
+        ZCONF_IPV6,
+        ZCONF_UNSPEC
+    };
+
     explicit ZConfService(QObject * parent = nullptr);
     ~ZConfService();
 
@@ -48,6 +55,7 @@ public slots:
     void registerService(const QString & name,
                          in_port_t port,
                          const QString & type = QLatin1String("_http._tcp"),
+                         const Protocol = ZCONF_IPV4,
                          const QStringMap & txtRecords = QStringMap());
     void resetService();
 

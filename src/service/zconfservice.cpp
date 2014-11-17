@@ -121,6 +121,18 @@ QString ZConfService::errorString() const
     return avahi_strerror(avahi_client_errno(d_ptr->client->client));
 }
 
+namespace
+{
+    static AvahiProtocol convertProtocol(ZConfService::Protocol proto)
+    {
+        switch(proto)
+        {
+            case ZConfService::ZCONF_IPV4: return AVAHI_PROTO_INET;
+            case ZConfService::ZCONF_IPV6: return AVAHI_PROTO_INET6;
+            default:         return AVAHI_PROTO_UNSPEC;
+        }
+    }
+}
 /*!
     Registers a Zeroconf service on the LAN. If no service type is specified,
     "_http._tcp" is assumed. Needless to say, the server should be available
@@ -129,6 +141,7 @@ QString ZConfService::errorString() const
 void ZConfService::registerService(const QString &name,
                                    in_port_t const port,
                                    const QString &type,
+                                   const Protocol protocol,
                                    const QStringMap &txtRecords)
 {
     if(   (nullptr == d_ptr->client->client)
@@ -162,7 +175,7 @@ void ZConfService::registerService(const QString &name,
 
         d_ptr->error = avahi_entry_group_add_service_strlst(d_ptr->group,
                                                             AVAHI_IF_UNSPEC,
-                                                            AVAHI_PROTO_UNSPEC,
+                                                            convertProtocol(protocol),
                                                             (AvahiPublishFlags) 0,
                                                             d_ptr->name.toLocal8Bit().data(),
                                                             d_ptr->type.toLocal8Bit().data(),

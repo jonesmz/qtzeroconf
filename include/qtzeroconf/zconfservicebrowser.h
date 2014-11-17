@@ -55,10 +55,17 @@ class ZConfServiceBrowser : public QObject
     Q_OBJECT
 
 public:
+    enum Protocol
+    {
+        ZCONF_IPV4,
+        ZCONF_IPV6,
+        ZCONF_UNSPEC
+    };
+
     explicit ZConfServiceBrowser(QObject *parent = 0);
     ~ZConfServiceBrowser();
 
-    void browse(const QString & serviceType = QLatin1String("_http._tcp"));
+    void browse(const QString & serviceType = QLatin1String("_http._tcp"), Protocol proto = ZCONF_UNSPEC);
     const ZConfServiceEntry& serviceEntry(const QString & name) const;
 
 signals:
