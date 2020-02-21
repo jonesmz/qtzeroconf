@@ -208,9 +208,10 @@ public:
                                                                         while(nullptr != txt)
                                                                         {
                                                                             static const QLatin1Char equals('=');
-                                                                            const QStringList & split = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
-                                                                                                                               txt->size).split(equals);
-                                                                            returnMap.insert(split.first(), split.last());
+                                                                            const QString &txtstr = QString::fromLocal8Bit(reinterpret_cast<const char*>(&(txt->text[0])),
+                                                                                                                           txt->size);
+                                                                            int equalspos = txtstr.indexOf(equals);
+                                                                            returnMap.insert(txtstr.left(equalspos), txtstr.right(txtstr.length() - equalspos - 1));
                                                                             txt = txt->next;
                                                                         }
                                                                         returnMap;
